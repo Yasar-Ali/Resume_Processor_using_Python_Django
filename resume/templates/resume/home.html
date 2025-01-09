@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resume Processor</h1>
+        <p>Upload a resume (PDF or DOCX) to extract information.</p>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <input type="file" name="resume" accept=".pdf,.docx,.doc" required>
+            </div>
+            <button type="submit" class="btn">Process Resume</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const response = await fetch('/api/extract_resume/', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <h3>Extracted Information:</h3>
+                    <p><strong>First Name:</strong> ${data.first_name || 'Not found'}</p>
+                    <p><strong>Email:</strong> ${data.email || 'Not found'}</p>
+                    <p><strong>Mobile Number:</strong> ${data.mobile_number || 'Not found'}</p>
+                `;
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
